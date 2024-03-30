@@ -1,0 +1,7 @@
+script_logging:
+  file_path: script.log
+  file_level: debug
+  file_format: "%(asctime)s - %(levelname)s - %(message)s"
+
+  console_level: info
+  console_format: "%(asctime)s - %(levelname)s - %(message)s"
