@@ -124,13 +124,12 @@ async def generate_segmentation_data(file: UploadFile):
 
 
 @app.post("/generate_product_suggestion")
-async def generate_product_suggestion(file: UploadFile, customer_id: str):
+async def generate_product_suggestion(customer_id: int, file: UploadFile):
     try:
-        # customer_id = order.customer_id
-        if customer_id is not str:
-            message = "Customer ID must be an integer"
-            logger.error(message)
-            raise HTTPException(status_code=400, detail=message)
+        # if type(customer_id) != int:
+        #     message = "Customer ID must be an integer"
+        #     logger.error(message)
+        #     raise HTTPException(status_code=400, detail=message)
 
         filename = file.filename
         logger.info(f"Processing file {filename}")
@@ -144,21 +143,18 @@ async def generate_product_suggestion(file: UploadFile, customer_id: str):
         else:
             data = pd.read_excel(file.file.read())
 
-        product_counts_by_country = (
-            data.groupby(["Country", "ProductID"])
-            .size()
-            .to_frame(name="count")
-            .reset_index()
-        )
+        product_counts_by_country = data[data["Country"] == "United Kingdom"]
+
         user_present = customer_id in data["CustomerID"].tolist()
         if not user_present:
             most_bought_product = product_counts_by_country[
-                product_counts_by_country["Country"] == "Great Britain"
-                ]["ProductID"].iloc[0]
+                product_counts_by_country["Country"] == "United Kingdom"
+                ]["Description"].iloc[0]
 
             return most_bought_product
+        
     except Exception:
-        logger.error("An exception occurred while making the request")
+        logger.exception("An exception occurred while making the request")
         raise HTTPException(status_code=400)
 
 
