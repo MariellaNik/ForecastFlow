@@ -7,3 +7,8 @@
 ### Serving
 "npm install" - to install the node_modules
 to build/run -> "npm start"
+
+### Backend
+- Python
+- Scikit-learn
+- FastAPI
