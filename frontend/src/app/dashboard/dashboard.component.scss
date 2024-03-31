@@ -43,49 +43,10 @@
           align-items: center;
           justify-content: center;
     
-          .logo, .greeting, .additional-logo, .world-clock {
+          .logo, .greeting, .world-clock {
             margin: 10px 0;
           }
         }
-    }
-
-    .widgets {
-        display: flex;
-        justify-content: space-around;
-        flex-wrap: wrap;
-        padding: 20px;
-
-        .widget {
-          margin: 10px;
-          padding: 20px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          text-align: center;
-      }
-
-        .widget {
-            width: calc(33% - 20px);
-            margin: 10px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-
-        }
-
-
-        @media (max-width: 768px) {
-            flex-direction: column;
-            align-items: center;
-
-            .widget {
-                width: 100%; 
-                margin: 10px 0;
-            }
-        }
-        
     }
 }
 
