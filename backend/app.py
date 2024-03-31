@@ -63,15 +63,15 @@ def generate_segmentation_data():
         frequency_bins = [rfm["Frequency"].min() - 1, 2, 3, 10, 100, rfm["Frequency"].max()]
         monetary_bins = [rfm["MonetaryValue"].min() - 3, 300, 600, 2000, 5000, rfm["MonetaryValue"].max()]
 
-        rfm["R_Score"] = pd.cut(rfm["Recency"], bins=recency_bins, labels=range(1, 6), include_lowest=True)
-        rfm["R_Score"] = 5 - rfm["R_Score"].astype(int) + 1
+        rfm["recency_score"] = pd.cut(rfm["Recency"], bins=recency_bins, labels=range(1, 6), include_lowest=True)
+        rfm["recency_score"] = 5 - rfm["recency_score"].astype(int) + 1
 
-        rfm["F_Score"] = pd.cut(rfm["Frequency"], bins=frequency_bins, labels=range(1, 6), include_lowest=True).astype(
+        rfm["frequency_score"] = pd.cut(rfm["Frequency"], bins=frequency_bins, labels=range(1, 6), include_lowest=True).astype(
             int)
-        rfm["M_Score"] = pd.cut(rfm["MonetaryValue"], bins=monetary_bins, labels=range(1, 6),
+        rfm["monetary_value_score"] = pd.cut(rfm["MonetaryValue"], bins=monetary_bins, labels=range(1, 6),
                                 include_lowest=True).astype(int)
 
-        x = rfm[["R_Score", "F_Score", "M_Score"]]
+        x = rfm[["recency_score", "frequency_score", "monetary_value_score"]]
 
         best_kmeans = KMeans(n_clusters=4, n_init=10, random_state=42)
         rfm["Cluster"] = best_kmeans.fit_predict(x)
@@ -81,7 +81,7 @@ def generate_segmentation_data():
         total_customers = cluster_counts.sum()
         percentage_customers = (cluster_counts / total_customers) * 100
 
-        labels = ["Power Shoppers", "Loyal Customers", "At-risk Customers", "Recent Customers"]
+        labels = ["Active Shoppers", "Loyal Customers", "At-risk Customers", "Recent Customers"]
 
         plt.figure(figsize=(10, 10), dpi=200)
         plt.pie(percentage_customers, labels=labels, autopct="%1.1f%%", startangle=90, colors=colors)
