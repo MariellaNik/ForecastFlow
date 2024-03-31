@@ -1,0 +1,21 @@
+.chart {
+    width: 50%;
+    height: 50%; /* Adjust as needed */
+    background-image: url('../../assets/background.png'); /* Replace 'file1.jpg' with your image file path */
+    background-size: cover; /* Cover the entire div with the background image */
+    background-position: center; /* Center the background image */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 35px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+
+.logo {
+  width: auto;
+  height: 200px;
+}
