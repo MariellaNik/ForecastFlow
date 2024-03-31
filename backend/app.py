@@ -1,27 +1,31 @@
-import os
-from datetime import datetime
-
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import uvicorn
-from fastapi import FastAPI, UploadFile, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sklearn.cluster import KMeans
-from starlette.responses import Response, FileResponse
+from starlette.responses import FileResponse
 
-from backend.common_functions import setup_logging, parse_config
+from common_functions import setup_logging, parse_config
+from rnn import get_regressor
 
 app = FastAPI()
 
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+]
 
-class Order(BaseModel):
-    InvoiceNo: str
-    Description: str
-    Quantity: int
-    InvoiceDate: datetime
-    UnitPrice: float
-    CustomerID: int
-    Country: str
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 config = parse_config("default_config.yaml")
@@ -29,30 +33,12 @@ script_logging = config["script_logging"]
 logger = setup_logging(script_logging)
 
 
-def check_file_valid(file_name):
-    try:
-        file_name, file_extension = os.path.splitext(file_name)
-        return file_extension.lower() in [".csv", ".xls", ".xlsx"]
-    except Exception:
-        logger.exception(f"An error occurred while processing file ({file_name})")
-        return False
-
-
 @app.post("/generate_segmentation_data")
-async def generate_segmentation_data(file: UploadFile):
+def generate_segmentation_data():
     try:
-        filename = file.filename
+        filename = "groceries.csv"
         logger.info(f"Processing file {filename}")
-        if not check_file_valid(filename):
-            message = "File type not supported"
-            logger.error(message)
-            raise HTTPException(status_code=400, detail=message)
-
-        if filename.endswith(".csv"):
-            data = pd.read_csv(file.file, on_bad_lines="skip")
-        else:
-            data = pd.read_excel(file.file.read())
-
+        data = pd.read_csv(filename, on_bad_lines="skip")
         data.dropna(subset=["CustomerID"], inplace=True)
         data["Quantity"] = data["Quantity"].astype(float)
         data["UnitPrice"] = data["UnitPrice"].astype(float)
@@ -87,20 +73,8 @@ async def generate_segmentation_data(file: UploadFile):
 
         x = rfm[["R_Score", "F_Score", "M_Score"]]
 
-        # inertia = []
-        # for k in range(2, 11):
-        #     kmeans = KMeans(n_clusters=k, n_init=10, random_state=42)
-        #     kmeans.fit(x)
-        #     inertia.append(kmeans.inertia_)
-
         best_kmeans = KMeans(n_clusters=4, n_init=10, random_state=42)
         rfm["Cluster"] = best_kmeans.fit_predict(x)
-        cluster_summary = rfm.groupby("Cluster").agg({
-            "R_Score": "mean",
-            "F_Score": "mean",
-            "M_Score": "mean"
-        }).reset_index()
-
         cluster_counts = rfm["Cluster"].value_counts()
 
         colors = ["#F1C40F", "#007BFF", "#E74C3C", "#9B59B6"]
@@ -109,13 +83,14 @@ async def generate_segmentation_data(file: UploadFile):
 
         labels = ["Power Shoppers", "Loyal Customers", "At-risk Customers", "Recent Customers"]
 
-        plt.figure(figsize=(8, 8), dpi=200)
+        plt.figure(figsize=(10, 10), dpi=200)
         plt.pie(percentage_customers, labels=labels, autopct="%1.1f%%", startangle=90, colors=colors)
-        plt.title("Percentage of Customers in Each Cluster")
-        plt.legend(cluster_summary["Cluster"], title="Cluster", loc="upper left")
+        plt.title("Percentage of Customers in Each Segment")
+        plt.legend(title="Segment", loc="upper left")
 
         plt.savefig("final.png", bbox_inches="tight")
         logger.info(f"Successfully processed file {filename}")
+        plt.clf()
         return FileResponse("final.png")
     except Exception:
         message = "An exception occurred while processing file"
@@ -123,36 +98,35 @@ async def generate_segmentation_data(file: UploadFile):
         raise HTTPException(status_code=400, detail=message)
 
 
-@app.post("/generate_product_suggestion")
-async def generate_product_suggestion(customer_id: int, file: UploadFile):
+@app.post("/generate_prediction")
+def generate_prediction():
     try:
-        # if type(customer_id) != int:
-        #     message = "Customer ID must be an integer"
-        #     logger.error(message)
-        #     raise HTTPException(status_code=400, detail=message)
+        dataset_train = pd.read_csv("groceries_bread_1.csv")
+        regressor, sc = get_regressor(dataset_train)
+        dataset_test = pd.read_csv("groceries_bread_2.csv")
 
-        filename = file.filename
-        logger.info(f"Processing file {filename}")
-        if not check_file_valid(filename):
-            message = "File type not supported"
-            logger.error(message)
-            raise HTTPException(status_code=400, detail=message)
+        dataset_total = pd.concat((dataset_train["quantity"], dataset_test["quantity"]), axis=0)
+        inputs = dataset_total[len(dataset_total) - len(dataset_test) - 60:].values
+        inputs = inputs.reshape(-1, 1)
+        inputs = sc.transform(inputs)
+        x_test = []
+        for i in range(60, 80):
+            x_test.append(inputs[i - 60:i, 0])
+        x_test = np.array(x_test)
+        x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+        predicted_quantity = regressor.predict(x_test)
+        predicted_quantity = sc.inverse_transform(predicted_quantity)
 
-        if filename.endswith(".csv"):
-            data = pd.read_csv(file.file, on_bad_lines="skip")
-        else:
-            data = pd.read_excel(file.file.read())
+        plt.plot(predicted_quantity, color="blue", label="Predicted Bread Quantity Needed")
+        plt.title("Bread Quantity Prediction")
+        plt.xlabel("Time")
+        plt.ylabel("Bread Quantity")
+        plt.legend()
+        plt.savefig("bread_quantity.png", bbox_inches="tight")
+        logger.info("Successfully made prediction")
+        plt.clf()
+        return FileResponse("bread_quantity.png")
 
-        product_counts_by_country = data[data["Country"] == "United Kingdom"]
-
-        user_present = customer_id in data["CustomerID"].tolist()
-        if not user_present:
-            most_bought_product = product_counts_by_country[
-                product_counts_by_country["Country"] == "United Kingdom"
-                ]["Description"].iloc[0]
-
-            return most_bought_product
-        
     except Exception:
         logger.exception("An exception occurred while making the request")
         raise HTTPException(status_code=400)
