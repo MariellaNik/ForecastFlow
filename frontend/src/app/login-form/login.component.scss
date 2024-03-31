@@ -1,0 +1,21 @@
+.chart {
+    width: 50%;
+    height: 50%; 
+    background-image: url('../../assets/background.png'); 
+    background-size: cover;
+    background-position: center; 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 35px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+
+.logo {
+  width: auto;
+  height: 200px;
+}
