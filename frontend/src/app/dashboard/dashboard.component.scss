@@ -60,3 +60,21 @@
   place-items: center;
   margin: auto;
 }
+
+button {
+  margin-top: 20px;
+}
+
+.segment2 {
+  width: 40em;
+  height: 40em;
+} 
+
+.segment.hidden {
+  display: none;
+}
+@media (max-width: 768px)
+{ .segment2 {
+  width: 20em;
+  height: 20em;
+} }

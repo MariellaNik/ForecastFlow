@@ -5,20 +5,14 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login-form/login.component';
 
 const routes: Routes = [
-  // {
-  //   path: '',
-  //   component: HomeComponent,      
-  //   //canActivate: [AuthGuardService]  
-  // },
   {
-    path: 'dashboard',
+    path: '',
     component: DashboardComponent,      
     //canActivate: [AuthGuardService]  
   },
   {
     path: 'login',
-    component: LoginComponent,      
-    //canActivate: [AuthGuardService]  
+    component: LoginComponent,
   },
 ];
 

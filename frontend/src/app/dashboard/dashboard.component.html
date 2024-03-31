@@ -35,8 +35,16 @@
       <div class="parent">
         <label for="formFileLg" class="form-label">Large file input example</label>
         <input class="form-control form-control-lg" id="formFileLg" type="file">
+        <button class="btn btn-primary" type="submit" (click)="toggleDiv()">Submit</button>
+
       </div>
+
+      
   </div>
 </div>
-  
+<div class="segment" [class.hidden]="!showDiv">
+  <img class="segment2" src="../../assets/final.png">
+  <h1>Our Tip</h1>
+  <h6>“Exclusive 20% Off for Your Next Purchase!”: Send them a personalized email or notification offering a 20% discount on their next order. Highlight that it’s a special offer just for them, emphasizing the value of their continued support. </h6>
+</div>
 

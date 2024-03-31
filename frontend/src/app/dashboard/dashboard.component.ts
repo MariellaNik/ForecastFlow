@@ -8,6 +8,7 @@ import { DatePipe } from '@angular/common';
   providers: [DatePipe]
 })
 export class DashboardComponent implements OnInit {
+  showDiv: any = false;
   userName = 'Test Client';
   currentTime=  new Date();
 
@@ -25,4 +26,9 @@ export class DashboardComponent implements OnInit {
       this.currentTime = new Date();
     }, 1000);
   }
+
+  toggleDiv(): void {
+    this.showDiv = !this.showDiv;
+  }
+
 }
