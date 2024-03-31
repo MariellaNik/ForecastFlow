@@ -1,0 +1,106 @@
+.dashboard {
+
+    .header {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 20px;
+        //border: 1px solid #ddd;
+        border-radius: 8px;
+        //box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+
+    
+
+        .logo {
+          height: 300px;
+          width: auto;
+          order: 0;
+        }
+    
+        .greeting {
+            font-size: 32px;
+            font-family: 'Rubik';
+            order: 1;
+        
+            @media (max-width: 768px) {
+                font-size: 26px; 
+            }
+        }
+    
+        .world-clock {
+          font-size: 56px;
+          padding: 10px 20px;
+          border-radius: 5px;
+          font-family: 'Roboto Mono', monospace;
+          background: transparent;
+          order: 4; 
+          font-weight: bold;
+        }
+    
+        @media (max-width: 768px) {
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+    
+          .logo, .greeting, .additional-logo, .world-clock {
+            margin: 10px 0;
+          }
+        }
+    }
+
+    .widgets {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        padding: 20px;
+
+        .widget {
+          margin: 10px;
+          padding: 20px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          text-align: center;
+      }
+
+        .widget {
+            width: calc(33% - 20px);
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+
+        }
+
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: center;
+
+            .widget {
+                width: 100%; 
+                margin: 10px 0;
+            }
+        }
+        
+    }
+}
+
+.logo2 {
+  width: 30px;
+  height: 30px;
+}
+
+.parent {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-left:max;
+}
+
+h3 {
+    margin: 20px;
+}

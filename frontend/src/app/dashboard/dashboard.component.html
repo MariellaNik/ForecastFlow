@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <img class="ibis" src="../../assets/logo.png" alt="Image" width="50" height="50">
+        <a class="nav-link active" aria-current="page" href="#">ForecastFlow</a>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        </ul>
+        <form class="d-flex">
+          <button class="btn btn-outline-success" type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+  
+
+  
+  
+  <div class="dashboard">
+    <div class="header">
+        <img src="../../assets/logo.png" alt="ERP Logo" class="logo">
+        <h1 class="greeting">
+            Welcome {{ userName }} !
+        </h1>
+        <h1 class="world-clock">
+          <p>{{ formatTime(currentTime) }}</p>
+        </h1>
+    </div>
+</div>
+
+<div class="dashboard">
+  <div class="header">
+      <div class="parent">
+        <label for="formFileLg" class="form-label">Large file input example</label>
+        <input class="form-control form-control-lg" id="formFileLg" type="file">
+      </div>
+  </div>
+</div>
+  
+
