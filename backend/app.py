@@ -3,13 +3,29 @@ import numpy as np
 import pandas as pd
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sklearn.cluster import KMeans
 from starlette.responses import FileResponse
 
-from backend.common_functions import setup_logging, parse_config
+from common_functions import setup_logging, parse_config
 from rnn import get_regressor
 
 app = FastAPI()
+
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 config = parse_config("default_config.yaml")
@@ -18,7 +34,7 @@ logger = setup_logging(script_logging)
 
 
 @app.post("/generate_segmentation_data")
-async def generate_segmentation_data():
+def generate_segmentation_data():
     try:
         filename = "groceries.csv"
         logger.info(f"Processing file {filename}")
@@ -74,6 +90,7 @@ async def generate_segmentation_data():
 
         plt.savefig("final.png", bbox_inches="tight")
         logger.info(f"Successfully processed file {filename}")
+        plt.clf()
         return FileResponse("final.png")
     except Exception:
         message = "An exception occurred while processing file"
@@ -82,7 +99,7 @@ async def generate_segmentation_data():
 
 
 @app.post("/generate_prediction")
-async def generate_prediction():
+def generate_prediction():
     try:
         dataset_train = pd.read_csv("groceries_bread_1.csv")
         regressor, sc = get_regressor(dataset_train)
@@ -97,16 +114,17 @@ async def generate_prediction():
             x_test.append(inputs[i - 60:i, 0])
         x_test = np.array(x_test)
         x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
-        predicted_stock_price = regressor.predict(x_test)
-        predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+        predicted_quantity = regressor.predict(x_test)
+        predicted_quantity = sc.inverse_transform(predicted_quantity)
 
-        plt.plot(predicted_stock_price, color="blue", label="Predicted Bread Quantity Needed")
+        plt.plot(predicted_quantity, color="blue", label="Predicted Bread Quantity Needed")
         plt.title("Bread Quantity Prediction")
         plt.xlabel("Time")
         plt.ylabel("Bread Quantity")
         plt.legend()
-
         plt.savefig("bread_quantity.png", bbox_inches="tight")
+        logger.info("Successfully made prediction")
+        plt.clf()
         return FileResponse("bread_quantity.png")
 
     except Exception:
